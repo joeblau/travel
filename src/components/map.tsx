@@ -10,7 +10,7 @@ import AddLocation from "./add-location";
 import Elevation from "./elevation";
 import Coordinates from "./coordinates";
 import CurrentLocation from "./current-location";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggleButton } from "./theme-toggle-button";
 
 export default function Map() {
 	const { theme, systemTheme } = useTheme();
@@ -496,7 +496,7 @@ export default function Map() {
 			<Clock longitude={centerLng} />
 			<Elevation zoom={zoom} />
 			<Coordinates latitude={centerLat} longitude={centerLng} />
-			<ThemeToggle />
+			<ThemeToggleButton variant="circle" blur={true} start="top-right" />
 			<CurrentLocation onLocationFound={handleUserLocation} />
 			<AddLocation onLocationAdded={loadLocations} />
 		</div>

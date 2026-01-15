@@ -6,11 +6,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Clock from "./clock";
 import AddLocation from "./add-location";
 import Elevation from "./elevation";
+import Coordinates from "./coordinates";
 
 export default function Map() {
 	const mapContainer = useRef<HTMLDivElement>(null);
 	const map = useRef<mapboxgl.Map | null>(null);
 	const [centerLng, setCenterLng] = useState(0);
+	const [centerLat, setCenterLat] = useState(20);
 	const [zoom, setZoom] = useState(2);
 
 	const loadLocations = useCallback(async () => {
@@ -161,6 +163,7 @@ export default function Map() {
 				if (map.current) {
 					const center = map.current.getCenter();
 					setCenterLng(center.lng);
+					setCenterLat(center.lat);
 					setZoom(map.current.getZoom());
 				}
 			});
@@ -183,6 +186,7 @@ export default function Map() {
 			<div ref={mapContainer} className="w-screen h-screen fixed inset-0" />
 			<Clock longitude={centerLng} />
 			<Elevation zoom={zoom} />
+			<Coordinates latitude={centerLat} longitude={centerLng} />
 			<AddLocation onLocationAdded={loadLocations} />
 		</div>
 	);

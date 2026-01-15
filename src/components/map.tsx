@@ -293,7 +293,7 @@ export default function Map() {
 							(position) => {
 								const { latitude, longitude } = position.coords;
 								console.log("Got geolocation:", { latitude, longitude });
-								handleUserLocation(longitude, latitude, true);
+								handleUserLocation(longitude, latitude, false);
 							},
 							(error) => {
 								console.log("Geolocation not available or denied:", error.message);

@@ -108,14 +108,6 @@ export default function Map() {
 
 			map.current.on("style.load", async () => {
 				if (map.current) {
-					map.current.setFog({
-						color: "rgb(186, 210, 235)",
-						"high-color": "rgb(36, 92, 223)",
-						"horizon-blend": 0.02,
-						"space-color": "rgb(11, 11, 25)",
-						"star-intensity": 0.6,
-					});
-
 					try {
 						// Fetch GeoJSON data
 						const response = await fetch("/conquer-earth-locations.geojson");

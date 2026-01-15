@@ -129,3 +129,16 @@
 .mapboxgl-compact {
 	display: none !important;
 }
+
+.mapboxgl-popup-content {
+	background: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(10px);
+	border-radius: 8px;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+	padding: 0;
+}
+
+.mapboxgl-popup-tip {
+	border-top-color: rgba(0, 0, 0, 0.85) !important;
+	border-bottom-color: rgba(0, 0, 0, 0.85) !important;
+}

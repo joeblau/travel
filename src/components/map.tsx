@@ -32,7 +32,7 @@ export default function Map() {
 				attributionControl: false,
 			});
 
-			map.current.on("style.load", () => {
+			map.current.on("style.load", async () => {
 				if (map.current) {
 					map.current.setFog({
 						color: "rgb(186, 210, 235)",
@@ -41,6 +41,91 @@ export default function Map() {
 						"space-color": "rgb(11, 11, 25)",
 						"star-intensity": 0.6,
 					});
+
+					try {
+						// Fetch GeoJSON data
+						const response = await fetch("/conquer-earth-locations.geojson");
+						const locationsData = await response.json();
+
+						// Add GeoJSON source
+						map.current.addSource("locations", {
+							type: "geojson",
+							data: locationsData as GeoJSON.FeatureCollection,
+						});
+
+						// Add circle layer for location points
+						map.current.addLayer({
+							id: "locations-circle",
+							type: "circle",
+							source: "locations",
+							paint: {
+								"circle-radius": [
+									"interpolate",
+									["linear"],
+									["zoom"],
+									2, 3,
+									10, 8
+								],
+								"circle-color": [
+									"match",
+									["get", "type"],
+									"City", "#3b82f6",
+									"Airport", "#8b5cf6",
+									"Park", "#10b981",
+									"Place", "#f59e0b",
+									"#ef4444"
+								],
+								"circle-opacity": 0.8,
+								"circle-stroke-width": 2,
+								"circle-stroke-color": "#ffffff",
+								"circle-stroke-opacity": 0.5,
+							},
+						});
+
+						// Create popup
+						const popup = new mapboxgl.Popup({
+							closeButton: false,
+							closeOnClick: false,
+						});
+
+						// Show popup on hover
+						map.current.on("mouseenter", "locations-circle", (e) => {
+							if (!map.current || !e.features || !e.features[0]) return;
+
+							map.current.getCanvas().style.cursor = "pointer";
+
+							const feature = e.features[0];
+							const coordinates = (feature.geometry as GeoJSON.Point).coordinates.slice() as [number, number];
+							const { title, type, description } = feature.properties || {};
+
+							// Ensure popup appears over the correct location
+							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+							}
+
+							const descriptionText = description ? `<p class="text-sm text-gray-400 mt-1">${description}</p>` : "";
+
+							popup
+								.setLngLat(coordinates)
+								.setHTML(
+									`<div class="p-2">
+										<h3 class="font-semibold text-white">${title}</h3>
+										<p class="text-xs text-gray-300">${type}</p>
+										${descriptionText}
+									</div>`
+								)
+								.addTo(map.current);
+						});
+
+						// Hide popup on mouse leave
+						map.current.on("mouseleave", "locations-circle", () => {
+							if (!map.current) return;
+							map.current.getCanvas().style.cursor = "";
+							popup.remove();
+						});
+					} catch (error) {
+						console.error("Failed to load locations data:", error);
+					}
 				}
 			});
 

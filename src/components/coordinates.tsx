@@ -17,11 +17,11 @@ export default function Coordinates({ latitude, longitude }: CoordinatesProps) {
 	const lonValue = Math.abs(longitude);
 
 	return (
-		<div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 px-3 py-2">
+		<div className="absolute bottom-4 right-4 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border px-3 py-2 z-10">
 			<div className="flex flex-col gap-1">
 				{/* Latitude */}
 				<div className="flex items-baseline gap-1">
-					<span className="text-white/50 text-[10px] uppercase tracking-wide w-8">
+					<span className="text-muted-foreground text-[10px] uppercase tracking-wide w-8">
 						Lat
 					</span>
 					<NumberFlow
@@ -30,16 +30,16 @@ export default function Coordinates({ latitude, longitude }: CoordinatesProps) {
 							minimumFractionDigits: 4,
 							maximumFractionDigits: 4,
 						}}
-						className="text-white font-mono text-sm font-semibold"
+						className="text-foreground font-mono text-sm font-semibold"
 					/>
-					<span className="text-white/70 text-xs font-medium w-3">
+					<span className="text-muted-foreground text-xs font-medium w-3">
 						{latDirection}
 					</span>
 				</div>
 
 				{/* Longitude */}
 				<div className="flex items-baseline gap-1">
-					<span className="text-white/50 text-[10px] uppercase tracking-wide w-8">
+					<span className="text-muted-foreground text-[10px] uppercase tracking-wide w-8">
 						Lng
 					</span>
 					<NumberFlow
@@ -48,9 +48,9 @@ export default function Coordinates({ latitude, longitude }: CoordinatesProps) {
 							minimumFractionDigits: 4,
 							maximumFractionDigits: 4,
 						}}
-						className="text-white font-mono text-sm font-semibold"
+						className="text-foreground font-mono text-sm font-semibold"
 					/>
-					<span className="text-white/70 text-xs font-medium w-3">
+					<span className="text-muted-foreground text-xs font-medium w-3">
 						{lonDirection}
 					</span>
 				</div>

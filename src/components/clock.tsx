@@ -35,16 +35,16 @@ export default function Clock({ longitude }: ClockProps) {
 	const minuteAngle = minutes * 6;
 
 	return (
-		<div className="absolute top-4 left-4 w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full shadow-lg border border-white/20">
+		<div className="absolute top-4 left-4 w-16 h-16 bg-card/80 backdrop-blur-sm rounded-full shadow-lg border border-border z-10">
 			<svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
-				<circle cx="32" cy="32" r="30" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+				<circle cx="32" cy="32" r="30" fill="none" className="stroke-border" strokeWidth="1" />
 
 				<line
 					x1="32"
 					y1="32"
 					x2="32"
 					y2="18"
-					stroke="white"
+					className="stroke-foreground"
 					strokeWidth="3"
 					strokeLinecap="round"
 					style={{
@@ -59,7 +59,7 @@ export default function Clock({ longitude }: ClockProps) {
 					y1="32"
 					x2="32"
 					y2="12"
-					stroke="white"
+					className="stroke-foreground"
 					strokeWidth="2"
 					strokeLinecap="round"
 					style={{

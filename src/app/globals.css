@@ -131,16 +131,22 @@
 }
 
 .mapboxgl-popup-content {
-	background: rgba(0, 0, 0, 0.85);
+	background: hsl(var(--popover));
 	backdrop-filter: blur(10px);
-	border-radius: 8px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+	border-radius: var(--radius);
+	border: 1px solid hsl(var(--border));
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	padding: 0;
+	color: hsl(var(--popover-foreground));
+}
+
+.dark .mapboxgl-popup-content {
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 .mapboxgl-popup-tip {
-	border-top-color: rgba(0, 0, 0, 0.85) !important;
-	border-bottom-color: rgba(0, 0, 0, 0.85) !important;
+	border-top-color: hsl(var(--popover)) !important;
+	border-bottom-color: hsl(var(--popover)) !important;
 }
 
 @keyframes pulse {

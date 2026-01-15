@@ -238,7 +238,7 @@ export default function Map() {
 
 	return (
 		<div className="relative w-screen h-screen">
-			<div ref={mapContainer} className="w-screen h-screen fixed inset-0" />
+			<div ref={mapContainer} className="w-screen h-screen fixed inset-0 z-0" />
 			<Clock longitude={centerLng} />
 			<Elevation zoom={zoom} />
 			<Coordinates latitude={centerLat} longitude={centerLng} />

@@ -107,7 +107,7 @@ export default function Map() {
 		}
 	}, []);
 
-	const handleUserLocation = useCallback((lng: number, lat: number, shouldFly = true) => {
+	const handleUserLocation = useCallback((lng: number, lat: number, shouldZoom = true) => {
 		if (!map.current) return;
 
 		console.log("Setting user location marker at:", { lng, lat });
@@ -137,15 +137,14 @@ export default function Map() {
 			.setLngLat([lng, lat])
 			.addTo(map.current);
 
-		// Fly to user's location if requested
-		if (shouldFly) {
-			map.current.flyTo({
-				center: [lng, lat],
-				zoom: 10,
-				duration: 2000,
-				essential: true,
-			});
-		}
+		// Pan to user's location
+		const currentZoom = map.current.getZoom();
+		map.current.flyTo({
+			center: [lng, lat],
+			zoom: shouldZoom ? 10 : currentZoom,
+			duration: 2000,
+			essential: true,
+		});
 	}, []);
 
 	useEffect(() => {

@@ -1,7 +1,5 @@
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 /**
  * Dynamic OG Image Generator with Real Mapbox Globe
  *

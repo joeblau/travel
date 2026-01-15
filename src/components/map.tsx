@@ -283,7 +283,7 @@ export default function Map() {
 								"fill-color": "#000000",
 								"fill-opacity": 0.3
 							}
-						});
+						}, "locations-circle");
 					}
 
 					// Automatically get user's location after map is loaded
@@ -445,7 +445,7 @@ export default function Map() {
 						"fill-color": "#000000",
 						"fill-opacity": 0.3
 					}
-				});
+				}, "locations-circle");
 			} catch (error) {
 				console.error("Failed to reload layers:", error);
 			}

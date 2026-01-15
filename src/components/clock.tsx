@@ -1,0 +1,68 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+interface ClockProps {
+	longitude: number;
+}
+
+export default function Clock({ longitude }: ClockProps) {
+	const [time, setTime] = useState(new Date());
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setTime(new Date());
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, []);
+
+	const timeOffsetMs = (longitude / 15) * 60 * 60 * 1000;
+	const utcTime = Date.UTC(
+		time.getUTCFullYear(),
+		time.getUTCMonth(),
+		time.getUTCDate(),
+		time.getUTCHours(),
+		time.getUTCMinutes(),
+		time.getUTCSeconds()
+	);
+	const localTime = new Date(utcTime + timeOffsetMs);
+
+	const hours = localTime.getUTCHours();
+	const minutes = localTime.getUTCMinutes();
+
+	const hourAngle = ((hours % 12) + minutes / 60) * 30;
+	const minuteAngle = minutes * 6;
+
+	return (
+		<div className="absolute top-4 left-4 w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full shadow-lg border border-white/20">
+			<svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
+				<circle cx="32" cy="32" r="30" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+
+				<line
+					x1="32"
+					y1="32"
+					x2="32"
+					y2="18"
+					stroke="white"
+					strokeWidth="3"
+					strokeLinecap="round"
+					style={{ transform: `rotate(${hourAngle}deg)`, transformOrigin: "32px 32px" }}
+				/>
+
+				<line
+					x1="32"
+					y1="32"
+					x2="32"
+					y2="12"
+					stroke="white"
+					strokeWidth="2"
+					strokeLinecap="round"
+					style={{ transform: `rotate(${minuteAngle}deg)`, transformOrigin: "32px 32px" }}
+				/>
+
+				<circle cx="32" cy="32" r="2" fill="white" />
+			</svg>
+		</div>
+	);
+}

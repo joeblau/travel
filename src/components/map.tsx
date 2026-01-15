@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Clock from "./clock";
 
 export default function Map() {
 	const mapContainer = useRef<HTMLDivElement>(null);
 	const map = useRef<mapboxgl.Map | null>(null);
+	const [centerLng, setCenterLng] = useState(0);
 
 	useEffect(() => {
 		if (map.current) return;
@@ -42,6 +44,13 @@ export default function Map() {
 			});
 
 			map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+			map.current.on("moveend", () => {
+				if (map.current) {
+					const center = map.current.getCenter();
+					setCenterLng(center.lng);
+				}
+			});
 		}
 
 		return () => {
@@ -50,5 +59,10 @@ export default function Map() {
 		};
 	}, []);
 
-	return <div ref={mapContainer} className="w-screen h-screen fixed inset-0" />;
+	return (
+		<div className="relative w-screen h-screen">
+			<div ref={mapContainer} className="w-screen h-screen fixed inset-0" />
+			<Clock longitude={centerLng} />
+		</div>
+	);
 }

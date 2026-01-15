@@ -17,16 +17,10 @@ export default function Clock({ longitude }: ClockProps) {
 		return () => clearInterval(interval);
 	}, []);
 
+	// Calculate time at the given longitude
+	// Earth rotates 15° per hour, so longitude / 15 gives hour offset from UTC
 	const timeOffsetMs = (longitude / 15) * 60 * 60 * 1000;
-	const utcTime = Date.UTC(
-		time.getUTCFullYear(),
-		time.getUTCMonth(),
-		time.getUTCDate(),
-		time.getUTCHours(),
-		time.getUTCMinutes(),
-		time.getUTCSeconds()
-	);
-	const localTime = new Date(utcTime + timeOffsetMs);
+	const localTime = new Date(time.getTime() + timeOffsetMs);
 
 	const hours = localTime.getUTCHours();
 	const minutes = localTime.getUTCMinutes();

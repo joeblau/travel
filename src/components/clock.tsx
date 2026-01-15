@@ -34,9 +34,16 @@ export default function Clock({ longitude }: ClockProps) {
 	const hourAngle = ((hours % 12) + minutes / 60) * 30;
 	const minuteAngle = minutes * 6;
 
+	// Calculate UTC offset for display
+	const utcOffsetHours = Math.round(longitude / 15);
+	const utcOffsetDisplay = utcOffsetHours >= 0
+		? `+${utcOffsetHours}`
+		: `${utcOffsetHours}`;
+
 	return (
-		<div className="absolute top-4 left-4 w-16 h-16 bg-card/80 backdrop-blur-sm rounded-full shadow-lg border border-border z-10">
-			<svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
+		<div className="absolute top-4 left-4 flex flex-col items-center gap-1 z-10">
+			<div className="w-16 h-16 bg-card/80 backdrop-blur-sm rounded-full shadow-lg border border-border">
+				<svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
 				<circle cx="32" cy="32" r="30" fill="none" className="stroke-border" strokeWidth="1" />
 
 				<line
@@ -69,7 +76,13 @@ export default function Clock({ longitude }: ClockProps) {
 					}}
 				/>
 
-			</svg>
+				</svg>
+			</div>
+			<div className="bg-card/80 backdrop-blur-sm rounded px-2 py-0.5 shadow-lg border border-border">
+				<span className="text-[10px] font-mono font-semibold text-foreground">
+					UTC{utcOffsetDisplay}
+				</span>
+			</div>
 		</div>
 	);
 }

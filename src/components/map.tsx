@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import SunCalc from "suncalc";
 import Clock from "./clock";
 import AddLocation from "./add-location";
 import Elevation from "./elevation";
@@ -16,6 +17,64 @@ export default function Map() {
 	const [centerLng, setCenterLng] = useState(0);
 	const [centerLat, setCenterLat] = useState(20);
 	const [zoom, setZoom] = useState(2);
+
+	const getNightPolygon = useCallback((date = new Date()): GeoJSON.Feature<GeoJSON.Polygon> => {
+		const points: [number, number][] = [];
+
+		// Calculate the terminator line (where sun is at horizon)
+		for (let lng = -180; lng <= 180; lng += 5) {
+			let lat = 0;
+			// Binary search to find latitude where sun altitude is approximately 0
+			let minLat = -90;
+			let maxLat = 90;
+
+			for (let i = 0; i < 10; i++) {
+				lat = (minLat + maxLat) / 2;
+				const sunPos = SunCalc.getPosition(date, lat, lng);
+				const sunAltitude = (sunPos.altitude * 180) / Math.PI;
+
+				if (sunAltitude > 0) {
+					maxLat = lat;
+				} else {
+					minLat = lat;
+				}
+			}
+
+			points.push([lng, lat]);
+		}
+
+		// Determine which side is dark by checking sun position at equator
+		const sunPosEquator = SunCalc.getPosition(date, 0, 0);
+		const sunAltitudeEquator = (sunPosEquator.altitude * 180) / Math.PI;
+
+		// Create polygon covering the dark hemisphere
+		const darkCoordinates: [number, number][] = [];
+
+		if (sunAltitudeEquator > 0) {
+			// Sun is visible at equator, so southern hemisphere is darker
+			darkCoordinates.push([-180, -90], [180, -90]);
+			for (let i = points.length - 1; i >= 0; i--) {
+				darkCoordinates.push(points[i]);
+			}
+			darkCoordinates.push([-180, -90]);
+		} else {
+			// Northern hemisphere is darker
+			darkCoordinates.push([-180, 90], [180, 90]);
+			for (const point of points) {
+				darkCoordinates.push(point);
+			}
+			darkCoordinates.push([-180, 90]);
+		}
+
+		return {
+			type: "Feature",
+			properties: {},
+			geometry: {
+				type: "Polygon",
+				coordinates: [darkCoordinates]
+			}
+		};
+	}, []);
 
 	const loadLocations = useCallback(async () => {
 		if (!map.current) return;
@@ -193,6 +252,29 @@ export default function Map() {
 						console.error("Failed to load locations data:", error);
 					}
 
+					// Add day/night layer
+					if (map.current) {
+						const nightPolygon = getNightPolygon();
+
+						map.current.addSource("night", {
+							type: "geojson",
+							data: {
+								type: "FeatureCollection",
+								features: [nightPolygon]
+							}
+						});
+
+						map.current.addLayer({
+							id: "night",
+							type: "fill",
+							source: "night",
+							paint: {
+								"fill-color": "#000000",
+								"fill-opacity": 0.3
+							}
+						});
+					}
+
 					// Automatically get user's location after map is loaded
 					if (navigator.geolocation) {
 						navigator.geolocation.getCurrentPosition(
@@ -234,7 +316,28 @@ export default function Map() {
 			map.current?.remove();
 			map.current = null;
 		};
-	}, [handleUserLocation]);
+	}, [handleUserLocation, getNightPolygon]);
+
+	// Update night layer every minute
+	useEffect(() => {
+		if (!map.current) return;
+
+		const updateNightLayer = () => {
+			if (map.current && map.current.getSource("night")) {
+				const nightPolygon = getNightPolygon();
+				const source = map.current.getSource("night") as mapboxgl.GeoJSONSource;
+				source.setData({
+					type: "FeatureCollection",
+					features: [nightPolygon]
+				});
+			}
+		};
+
+		// Update every minute
+		const interval = setInterval(updateNightLayer, 60000);
+
+		return () => clearInterval(interval);
+	}, [getNightPolygon]);
 
 	return (
 		<div className="relative w-screen h-screen">

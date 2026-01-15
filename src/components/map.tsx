@@ -360,8 +360,20 @@ export default function Map() {
 
 		if (isDarkStyle === shouldBeDark) return;
 
+		// Save current map position before changing style
+		const center = map.current.getCenter();
+		const zoom = map.current.getZoom();
+		const bearing = map.current.getBearing();
+		const pitch = map.current.getPitch();
+
 		const handleStyleChange = async () => {
 			if (!map.current) return;
+
+			// Restore map position after style loads
+			map.current.setCenter(center);
+			map.current.setZoom(zoom);
+			map.current.setBearing(bearing);
+			map.current.setPitch(pitch);
 
 			try {
 				// Fetch GeoJSON data

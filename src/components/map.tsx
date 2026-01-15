@@ -29,6 +29,7 @@ export default function Map() {
 				center: [0, 20],
 				zoom: 2,
 				projection: { name: "globe" },
+				attributionControl: false,
 			});
 
 			map.current.on("style.load", () => {
@@ -42,8 +43,6 @@ export default function Map() {
 					});
 				}
 			});
-
-			map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
 			map.current.on("moveend", () => {
 				if (map.current) {

@@ -19,6 +19,10 @@ interface GeocodingResult {
 	text: string;
 }
 
+interface MapboxGeocodingResponse {
+	features: GeocodingResult[];
+}
+
 interface AddLocationProps {
 	onLocationAdded?: () => void;
 }
@@ -56,7 +60,7 @@ export default function AddLocation({ onLocationAdded }: AddLocationProps) {
 						search
 					)}.json?access_token=${mapboxToken}&types=place,locality,poi&limit=5`
 				);
-				const data = await response.json();
+				const data = (await response.json()) as MapboxGeocodingResponse;
 				setResults(data.features || []);
 			} catch (error) {
 				console.error("Failed to search locations:", error);

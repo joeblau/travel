@@ -36,19 +36,21 @@ export default function Map() {
 	const getNightPolygon = useCallback((date = new Date()): GeoJSON.Feature<GeoJSON.Polygon> => {
 		const points: [number, number][] = [];
 
-		// Calculate the terminator line (where sun is at horizon)
-		for (let lng = -180; lng <= 180; lng += 5) {
+		// Calculate the terminator line with higher resolution
+		for (let lng = -180; lng <= 180; lng += 2) {
 			let lat = 0;
-			// Binary search to find latitude where sun altitude is approximately 0
+			// Binary search to find latitude where sun altitude is at horizon
 			let minLat = -90;
 			let maxLat = 90;
 
-			for (let i = 0; i < 10; i++) {
+			// Increased iterations for better precision
+			for (let i = 0; i < 15; i++) {
 				lat = (minLat + maxLat) / 2;
 				const sunPos = SunCalc.getPosition(date, lat, lng);
 				const sunAltitude = (sunPos.altitude * 180) / Math.PI;
 
-				if (sunAltitude > 0) {
+				// Use -0.833 degrees to account for atmospheric refraction
+				if (sunAltitude > -0.833) {
 					maxLat = lat;
 				} else {
 					minLat = lat;
@@ -58,27 +60,32 @@ export default function Map() {
 			points.push([lng, lat]);
 		}
 
-		// Determine which side is dark by checking sun position at equator
-		const sunPosEquator = SunCalc.getPosition(date, 0, 0);
-		const sunAltitudeEquator = (sunPosEquator.altitude * 180) / Math.PI;
+		// Determine which direction to build polygon
+		// Check sun position at a point north of the terminator to see which side is dark (flipped)
+		const firstPoint = points[0];
+		const testLat = firstPoint[1] + 10; // 10 degrees toward north (flipped from south)
+		const testSunPos = SunCalc.getPosition(date, testLat, firstPoint[0]);
+		const testAltitude = (testSunPos.altitude * 180) / Math.PI;
 
-		// Create polygon covering the dark hemisphere
+		// Create polygon covering the dark side
 		const darkCoordinates: [number, number][] = [];
 
-		if (sunAltitudeEquator > 0) {
-			// Sun is visible at equator, so southern hemisphere is darker
-			darkCoordinates.push([-180, -90], [180, -90]);
+		if (testAltitude > -0.833) {
+			// North of terminator is light, so south is dark - build polygon covering southern area (flipped)
+			darkCoordinates.push([-180, -90]);
+			darkCoordinates.push([180, -90]);
 			for (let i = points.length - 1; i >= 0; i--) {
 				darkCoordinates.push(points[i]);
 			}
-			darkCoordinates.push([-180, -90]);
+			darkCoordinates.push([-180, points[0][1]]);
 		} else {
-			// Northern hemisphere is darker
-			darkCoordinates.push([-180, 90], [180, 90]);
-			for (const point of points) {
-				darkCoordinates.push(point);
-			}
+			// North of terminator is dark - build polygon covering northern area (flipped)
 			darkCoordinates.push([-180, 90]);
+			darkCoordinates.push([180, 90]);
+			for (let i = points.length - 1; i >= 0; i--) {
+				darkCoordinates.push(points[i]);
+			}
+			darkCoordinates.push([-180, points[0][1]]);
 		}
 
 		return {

@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 		siteName: "Travel Globe",
 		images: [
 			{
-				url: "/og-image.png",
+				url: "/api/og-globe",
 				width: 1200,
 				height: 630,
 				alt: "Travel Globe - Interactive World Map"
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 		title: "Travel Globe",
 		description: "Interactive 3D globe for tracking and exploring travel locations around the world",
 		creator: "@joeblau",
-		images: ["/og-image.png"]
+		images: ["/api/og-globe"]
 	},
 	robots: {
 		index: true,

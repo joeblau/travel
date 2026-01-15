@@ -239,14 +239,14 @@ export default function Map() {
 								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 							}
 
-							const descriptionText = description ? `<p class="text-sm text-gray-400 mt-1">${description}</p>` : "";
+							const descriptionText = description ? `<p style="font-size: 0.875rem; line-height: 1.25rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem;">${description}</p>` : "";
 
 							popup
 								.setLngLat(coordinates)
 								.setHTML(
-									`<div class="p-2">
-										<h3 class="font-semibold text-white">${title}</h3>
-										<p class="text-xs text-gray-300">${type}</p>
+									`<div style="padding: 0.75rem;">
+										<h3 style="font-weight: 600; color: hsl(var(--popover-foreground)); line-height: 1.5;">${title}</h3>
+										<p style="font-size: 0.75rem; line-height: 1rem; color: hsl(var(--muted-foreground)); margin-top: 0.125rem;">${type}</p>
 										${descriptionText}
 									</div>`
 								)
@@ -406,14 +406,14 @@ export default function Map() {
 						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 					}
 
-					const descriptionText = description ? `<p class="text-sm text-gray-400 mt-1">${description}</p>` : "";
+					const descriptionText = description ? `<p style="font-size: 0.875rem; line-height: 1.25rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem;">${description}</p>` : "";
 
 					popup
 						.setLngLat(coordinates)
 						.setHTML(
-							`<div class="p-2">
-								<h3 class="font-semibold text-white">${title}</h3>
-								<p class="text-xs text-gray-300">${type}</p>
+							`<div style="padding: 0.75rem;">
+								<h3 style="font-weight: 600; color: hsl(var(--popover-foreground)); line-height: 1.5;">${title}</h3>
+								<p style="font-size: 0.75rem; line-height: 1rem; color: hsl(var(--muted-foreground)); margin-top: 0.125rem;">${type}</p>
 								${descriptionText}
 							</div>`
 						)

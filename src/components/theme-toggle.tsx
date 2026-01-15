@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
 	if (!mounted) {
 		return (
-			<button className="absolute top-4 right-4 p-2 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border z-10">
+			<button className="absolute top-20 right-4 p-2 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border z-10">
 				<div className="w-5 h-5" />
 			</button>
 		);
@@ -26,7 +26,7 @@ export function ThemeToggle() {
 	return (
 		<button
 			onClick={() => setTheme(isDark ? "light" : "dark")}
-			className="absolute top-4 right-4 p-2 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border hover:bg-card transition-colors z-10"
+			className="absolute top-20 right-4 p-2 bg-card/80 backdrop-blur-sm rounded-lg shadow-lg border border-border hover:bg-card transition-colors z-10"
 			aria-label="Toggle theme"
 		>
 			{isDark ? (

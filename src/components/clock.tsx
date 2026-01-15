@@ -47,7 +47,11 @@ export default function Clock({ longitude }: ClockProps) {
 					stroke="white"
 					strokeWidth="3"
 					strokeLinecap="round"
-					style={{ transform: `rotate(${hourAngle}deg)`, transformOrigin: "32px 32px" }}
+					style={{
+						transform: `rotate(${hourAngle}deg)`,
+						transformOrigin: "32px 32px",
+						transition: "transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)"
+					}}
 				/>
 
 				<line
@@ -58,7 +62,11 @@ export default function Clock({ longitude }: ClockProps) {
 					stroke="white"
 					strokeWidth="2"
 					strokeLinecap="round"
-					style={{ transform: `rotate(${minuteAngle}deg)`, transformOrigin: "32px 32px" }}
+					style={{
+						transform: `rotate(${minuteAngle}deg)`,
+						transformOrigin: "32px 32px",
+						transition: "transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)"
+					}}
 				/>
 
 			</svg>

@@ -20,7 +20,7 @@ export default function Map() {
 
 			const source = map.current.getSource("locations") as mapboxgl.GeoJSONSource;
 			if (source) {
-				source.setData(locationsData);
+				source.setData(locationsData as GeoJSON.FeatureCollection);
 			}
 		} catch (error) {
 			console.error("Failed to reload locations data:", error);
@@ -28,16 +28,25 @@ export default function Map() {
 	}, []);
 
 	useEffect(() => {
+		console.log("Map useEffect running");
+		console.log("map.current:", map.current);
+
 		if (map.current) return;
 
+		// Access env var - Next.js inlines this at build time
 		const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+		console.log("Mapbox token:", mapboxToken ? "Found" : "Not found");
+		console.log("All env vars:", Object.keys(process.env));
 
 		if (!mapboxToken) {
 			console.error("Mapbox token is not set. Please add NEXT_PUBLIC_MAPBOX_TOKEN to your .env.local file");
+			console.error("Build-time env:", process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
 			return;
 		}
 
 		mapboxgl.accessToken = mapboxToken;
+		console.log("Mapbox accessToken set successfully");
 
 		if (mapContainer.current) {
 			map.current = new mapboxgl.Map({

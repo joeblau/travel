@@ -131,8 +131,8 @@
 }
 
 .mapboxgl-popup-content {
-	background: var(--popover);
-	backdrop-filter: blur(10px);
+	background: oklch(from var(--popover) l c h / 0.95);
+	backdrop-filter: blur(8px);
 	border-radius: var(--radius);
 	border: 1px solid var(--border);
 	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -141,12 +141,18 @@
 }
 
 .dark .mapboxgl-popup-content {
+	background: oklch(from var(--popover) l c h / 0.95);
 	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 .mapboxgl-popup-tip {
-	border-top-color: var(--popover) !important;
-	border-bottom-color: var(--popover) !important;
+	border-top-color: oklch(from var(--popover) l c h / 0.95) !important;
+	border-bottom-color: oklch(from var(--popover) l c h / 0.95) !important;
+}
+
+.dark .mapboxgl-popup-tip {
+	border-top-color: oklch(from var(--popover) l c h / 0.95) !important;
+	border-bottom-color: oklch(from var(--popover) l c h / 0.95) !important;
 }
 
 .popup-container {

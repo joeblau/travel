@@ -34,6 +34,9 @@
 	],
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"NEXT_PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoiam9lYmxhdSIsImEiOiJjbWtlenE1ejYwNW1sM2VvYWM1dTBkNXBkIn0.e6FhxmbEu_nPaUHe6M20Cw"
 	}
 	/**
 	 * Smart Placement

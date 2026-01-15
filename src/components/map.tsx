@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import SunCalc from "suncalc";
@@ -9,14 +10,28 @@ import AddLocation from "./add-location";
 import Elevation from "./elevation";
 import Coordinates from "./coordinates";
 import CurrentLocation from "./current-location";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function Map() {
+	const { theme, systemTheme } = useTheme();
 	const mapContainer = useRef<HTMLDivElement>(null);
 	const map = useRef<mapboxgl.Map | null>(null);
 	const userLocationMarker = useRef<mapboxgl.Marker | null>(null);
 	const [centerLng, setCenterLng] = useState(0);
 	const [centerLat, setCenterLat] = useState(20);
 	const [zoom, setZoom] = useState(2);
+	const [mounted, setMounted] = useState(false);
+
+	// Get the current theme, defaulting to dark
+	const currentTheme = theme === "system" ? systemTheme : theme;
+	const mapStyle = currentTheme === "light"
+		? "mapbox://styles/mapbox/light-v11"
+		: "mapbox://styles/mapbox/dark-v11";
+
+	// Handle hydration
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const getNightPolygon = useCallback((date = new Date()): GeoJSON.Feature<GeoJSON.Polygon> => {
 		const points: [number, number][] = [];
@@ -137,7 +152,7 @@ export default function Map() {
 		console.log("Map useEffect running");
 		console.log("map.current:", map.current);
 
-		if (map.current) return;
+		if (map.current || !mounted) return;
 
 		// Access env var - Next.js inlines this at build time
 		const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -157,7 +172,7 @@ export default function Map() {
 		if (mapContainer.current) {
 			map.current = new mapboxgl.Map({
 				container: mapContainer.current,
-				style: "mapbox://styles/mapbox/dark-v11",
+				style: mapStyle,
 				center: [0, 20],
 				zoom: 2,
 				projection: { name: "globe" },
@@ -177,7 +192,7 @@ export default function Map() {
 							data: locationsData as GeoJSON.FeatureCollection,
 						});
 
-						// Add circle layer for location points
+						// Add circle layer for location points with wide color gamut
 						map.current.addLayer({
 							id: "locations-circle",
 							type: "circle",
@@ -193,13 +208,13 @@ export default function Map() {
 								"circle-color": [
 									"match",
 									["get", "type"],
-									"City", "#35b5ff",
-									"Airport", "#b300ff",
-									"Park", "#00ff3f",
-									"Place", "#fffb38",
-									"#ff479c"
+									"City", "rgb(0, 200, 255)",
+									"Airport", "rgb(200, 0, 255)",
+									"Park", "rgb(0, 255, 100)",
+									"Place", "rgb(255, 255, 0)",
+									"rgb(255, 50, 180)"
 								],
-								"circle-opacity": 0.9,
+								"circle-opacity": 1.0,
 								"circle-stroke-width": 0,
 							},
 						});
@@ -313,7 +328,140 @@ export default function Map() {
 			map.current?.remove();
 			map.current = null;
 		};
-	}, [handleUserLocation, getNightPolygon]);
+	}, [handleUserLocation, getNightPolygon, mounted, mapStyle]);
+
+	// Handle theme changes
+	useEffect(() => {
+		if (!map.current || !mounted) return;
+
+		// Check if map is already loaded and style is different
+		if (!map.current.isStyleLoaded()) return;
+
+		const currentStyle = map.current.getStyle();
+		const currentStyleUrl = (currentStyle as unknown as { sprite?: string })?.sprite;
+
+		// Only update if the style is actually different
+		const isDarkStyle = currentStyleUrl?.includes("dark");
+		const shouldBeDark = mapStyle.includes("dark");
+
+		if (isDarkStyle === shouldBeDark) return;
+
+		const handleStyleChange = async () => {
+			if (!map.current) return;
+
+			try {
+				// Fetch GeoJSON data
+				const response = await fetch("/conquer-earth-locations.geojson");
+				const locationsData = await response.json();
+
+				// Add GeoJSON source
+				map.current.addSource("locations", {
+					type: "geojson",
+					data: locationsData as GeoJSON.FeatureCollection,
+				});
+
+				// Add circle layer for location points with wide color gamut
+				map.current.addLayer({
+					id: "locations-circle",
+					type: "circle",
+					source: "locations",
+					paint: {
+						"circle-radius": [
+							"interpolate",
+							["linear"],
+							["zoom"],
+							2, 3,
+							10, 8
+						],
+						"circle-color": [
+							"match",
+							["get", "type"],
+							"City", "rgb(0, 200, 255)",
+							"Airport", "rgb(200, 0, 255)",
+							"Park", "rgb(0, 255, 100)",
+							"Place", "rgb(255, 255, 0)",
+							"rgb(255, 50, 180)"
+						],
+						"circle-opacity": 1.0,
+						"circle-stroke-width": 0,
+					},
+				});
+
+				// Create popup
+				const popup = new mapboxgl.Popup({
+					closeButton: false,
+					closeOnClick: false,
+				});
+
+				// Show popup on hover
+				map.current.on("mouseenter", "locations-circle", (e) => {
+					if (!map.current || !e.features || !e.features[0]) return;
+
+					map.current.getCanvas().style.cursor = "pointer";
+
+					const feature = e.features[0];
+					const coordinates = (feature.geometry as GeoJSON.Point).coordinates.slice() as [number, number];
+					const { title, type, description } = feature.properties || {};
+
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+
+					const descriptionText = description ? `<p class="text-sm text-gray-400 mt-1">${description}</p>` : "";
+
+					popup
+						.setLngLat(coordinates)
+						.setHTML(
+							`<div class="p-2">
+								<h3 class="font-semibold text-white">${title}</h3>
+								<p class="text-xs text-gray-300">${type}</p>
+								${descriptionText}
+							</div>`
+						)
+						.addTo(map.current);
+				});
+
+				// Hide popup on mouse leave
+				map.current.on("mouseleave", "locations-circle", () => {
+					if (!map.current) return;
+					map.current.getCanvas().style.cursor = "";
+					popup.remove();
+				});
+
+				// Add day/night layer
+				const nightPolygon = getNightPolygon();
+				map.current.addSource("night", {
+					type: "geojson",
+					data: {
+						type: "FeatureCollection",
+						features: [nightPolygon]
+					}
+				});
+
+				map.current.addLayer({
+					id: "night",
+					type: "fill",
+					source: "night",
+					paint: {
+						"fill-color": "#000000",
+						"fill-opacity": 0.3
+					}
+				});
+			} catch (error) {
+				console.error("Failed to reload layers:", error);
+			}
+		};
+
+		// Update map style when theme changes
+		map.current.once("style.load", handleStyleChange);
+		map.current.setStyle(mapStyle);
+
+		return () => {
+			if (map.current) {
+				map.current.off("style.load", handleStyleChange);
+			}
+		};
+	}, [mapStyle, mounted, getNightPolygon]);
 
 	// Update night layer every minute
 	useEffect(() => {
@@ -342,6 +490,7 @@ export default function Map() {
 			<Clock longitude={centerLng} />
 			<Elevation zoom={zoom} />
 			<Coordinates latitude={centerLat} longitude={centerLng} />
+			<ThemeToggle />
 			<CurrentLocation onLocationFound={handleUserLocation} />
 			<AddLocation onLocationAdded={loadLocations} />
 		</div>

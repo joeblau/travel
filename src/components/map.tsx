@@ -1,14 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Clock from "./clock";
+import AddLocation from "./add-location";
 
 export default function Map() {
 	const mapContainer = useRef<HTMLDivElement>(null);
 	const map = useRef<mapboxgl.Map | null>(null);
 	const [centerLng, setCenterLng] = useState(0);
+
+	const loadLocations = useCallback(async () => {
+		if (!map.current) return;
+
+		try {
+			const response = await fetch("/conquer-earth-locations.geojson");
+			const locationsData = await response.json();
+
+			const source = map.current.getSource("locations") as mapboxgl.GeoJSONSource;
+			if (source) {
+				source.setData(locationsData);
+			}
+		} catch (error) {
+			console.error("Failed to reload locations data:", error);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (map.current) return;
@@ -147,6 +164,7 @@ export default function Map() {
 		<div className="relative w-screen h-screen">
 			<div ref={mapContainer} className="w-screen h-screen fixed inset-0" />
 			<Clock longitude={centerLng} />
+			<AddLocation onLocationAdded={loadLocations} />
 		</div>
 	);
 }

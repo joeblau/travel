@@ -293,6 +293,14 @@ export default function Map() {
 						}, "locations-circle");
 					}
 
+					// Update center coordinates on initial load
+					if (map.current) {
+						const center = map.current.getCenter();
+						setCenterLng(center.lng);
+						setCenterLat(center.lat);
+						setZoom(map.current.getZoom());
+					}
+
 					// Automatically get user's location after map is loaded
 					if (navigator.geolocation) {
 						navigator.geolocation.getCurrentPosition(

@@ -246,14 +246,14 @@ export default function Map() {
 								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 							}
 
-							const descriptionText = description ? `<p style="font-size: 0.875rem; line-height: 1.25rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem;">${description}</p>` : "";
+							const descriptionText = description ? `<p class="popup-description">${description}</p>` : "";
 
 							popup
 								.setLngLat(coordinates)
 								.setHTML(
-									`<div style="padding: 0.75rem;">
-										<h3 style="font-weight: 600; color: hsl(var(--popover-foreground)); line-height: 1.5;">${title}</h3>
-										<p style="font-size: 0.75rem; line-height: 1rem; color: hsl(var(--muted-foreground)); margin-top: 0.125rem;">${type}</p>
+									`<div class="popup-container">
+										<h3 class="popup-title">${title}</h3>
+										<p class="popup-type">${type}</p>
 										${descriptionText}
 									</div>`
 								)
@@ -413,14 +413,14 @@ export default function Map() {
 						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 					}
 
-					const descriptionText = description ? `<p style="font-size: 0.875rem; line-height: 1.25rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem;">${description}</p>` : "";
+					const descriptionText = description ? `<p class="popup-description">${description}</p>` : "";
 
 					popup
 						.setLngLat(coordinates)
 						.setHTML(
-							`<div style="padding: 0.75rem;">
-								<h3 style="font-weight: 600; color: hsl(var(--popover-foreground)); line-height: 1.5;">${title}</h3>
-								<p style="font-size: 0.75rem; line-height: 1rem; color: hsl(var(--muted-foreground)); margin-top: 0.125rem;">${type}</p>
+							`<div class="popup-container">
+								<h3 class="popup-title">${title}</h3>
+								<p class="popup-type">${type}</p>
 								${descriptionText}
 							</div>`
 						)

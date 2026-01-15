@@ -61,7 +61,6 @@ export default function Clock({ longitude }: ClockProps) {
 					style={{ transform: `rotate(${minuteAngle}deg)`, transformOrigin: "32px 32px" }}
 				/>
 
-				<circle cx="32" cy="32" r="2" fill="white" />
 			</svg>
 		</div>
 	);

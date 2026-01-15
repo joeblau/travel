@@ -10,6 +10,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "travel",
 	"main": ".open-next/worker.js",
+	"account_id": "2b04333c55d653550f69d1c732b92d98",
 	"compatibility_date": "2025-12-01",
 	"compatibility_flags": [
 		"nodejs_compat",
@@ -34,9 +35,6 @@
 	],
 	"observability": {
 		"enabled": true
-	},
-	"vars": {
-		"NEXT_PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoiam9lYmxhdSIsImEiOiJjbWtlenE1ejYwNW1sM2VvYWM1dTBkNXBkIn0.e6FhxmbEu_nPaUHe6M20Cw"
 	}
 	/**
 	 * Smart Placement

@@ -7,10 +7,12 @@ import Clock from "./clock";
 import AddLocation from "./add-location";
 import Elevation from "./elevation";
 import Coordinates from "./coordinates";
+import CurrentLocation from "./current-location";
 
 export default function Map() {
 	const mapContainer = useRef<HTMLDivElement>(null);
 	const map = useRef<mapboxgl.Map | null>(null);
+	const userLocationMarker = useRef<mapboxgl.Marker | null>(null);
 	const [centerLng, setCenterLng] = useState(0);
 	const [centerLat, setCenterLat] = useState(20);
 	const [zoom, setZoom] = useState(2);
@@ -28,6 +30,48 @@ export default function Map() {
 			}
 		} catch (error) {
 			console.error("Failed to reload locations data:", error);
+		}
+	}, []);
+
+	const handleUserLocation = useCallback((lng: number, lat: number, shouldFly = true) => {
+		if (!map.current) return;
+
+		console.log("Setting user location marker at:", { lng, lat });
+
+		// Remove existing marker if any
+		if (userLocationMarker.current) {
+			userLocationMarker.current.remove();
+		}
+
+		// Create custom marker element for user location
+		const el = document.createElement("div");
+		el.className = "user-location-marker";
+		el.style.width = "20px";
+		el.style.height = "20px";
+		el.style.borderRadius = "50%";
+		el.style.backgroundColor = "#3b82f6";
+		el.style.border = "3px solid white";
+		el.style.boxShadow = "0 0 10px rgba(59, 130, 246, 0.5)";
+
+		// Add pulsing animation
+		el.style.animation = "pulse 2s infinite";
+
+		// Add marker at user's location with center anchor
+		userLocationMarker.current = new mapboxgl.Marker({
+			element: el,
+			anchor: "center"
+		})
+			.setLngLat([lng, lat])
+			.addTo(map.current);
+
+		// Fly to user's location if requested
+		if (shouldFly) {
+			map.current.flyTo({
+				center: [lng, lat],
+				zoom: 10,
+				duration: 2000,
+				essential: true,
+			});
 		}
 	}, []);
 
@@ -156,6 +200,25 @@ export default function Map() {
 					} catch (error) {
 						console.error("Failed to load locations data:", error);
 					}
+
+					// Automatically get user's location after map is loaded
+					if (navigator.geolocation) {
+						navigator.geolocation.getCurrentPosition(
+							(position) => {
+								const { latitude, longitude } = position.coords;
+								console.log("Got geolocation:", { latitude, longitude });
+								handleUserLocation(longitude, latitude, true);
+							},
+							(error) => {
+								console.log("Geolocation not available or denied:", error.message);
+							},
+							{
+								enableHighAccuracy: true,
+								timeout: 5000,
+								maximumAge: 0,
+							}
+						);
+					}
 				}
 			});
 
@@ -179,7 +242,7 @@ export default function Map() {
 			map.current?.remove();
 			map.current = null;
 		};
-	}, []);
+	}, [handleUserLocation]);
 
 	return (
 		<div className="relative w-screen h-screen">
@@ -187,6 +250,7 @@ export default function Map() {
 			<Clock longitude={centerLng} />
 			<Elevation zoom={zoom} />
 			<Coordinates latitude={centerLat} longitude={centerLng} />
+			<CurrentLocation onLocationFound={handleUserLocation} />
 			<AddLocation onLocationAdded={loadLocations} />
 		</div>
 	);

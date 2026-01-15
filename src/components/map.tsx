@@ -108,9 +108,8 @@ export default function Map() {
 		el.style.width = "20px";
 		el.style.height = "20px";
 		el.style.borderRadius = "50%";
-		el.style.backgroundColor = "#3b82f6";
-		el.style.border = "3px solid white";
-		el.style.boxShadow = "0 0 10px rgba(59, 130, 246, 0.5)";
+		el.style.backgroundColor = "#35b5ff";
+		el.style.boxShadow = "0 0 10px rgba(53, 181, 255, 0.7)";
 
 		// Add pulsing animation
 		el.style.animation = "pulse 2s infinite";
@@ -194,16 +193,14 @@ export default function Map() {
 								"circle-color": [
 									"match",
 									["get", "type"],
-									"City", "#3b82f6",
-									"Airport", "#8b5cf6",
-									"Park", "#10b981",
-									"Place", "#f59e0b",
-									"#ef4444"
+									"City", "#35b5ff",
+									"Airport", "#b300ff",
+									"Park", "#00ff3f",
+									"Place", "#fffb38",
+									"#ff479c"
 								],
-								"circle-opacity": 0.8,
-								"circle-stroke-width": 2,
-								"circle-stroke-color": "#ffffff",
-								"circle-stroke-opacity": 0.5,
+								"circle-opacity": 0.9,
+								"circle-stroke-width": 0,
 							},
 						});
 
